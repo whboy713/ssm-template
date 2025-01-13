@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <h1>添加员工数据</h1>
+
+    <form th:action="@{/emp}" method="post">
+        员工姓名：<input type="text" name="empName" /><br/>
+        员工工资：<input type="text" name="empSalary" /><br/>
+        <button type="submit">保存</button>
+    </form>
+
+</body>
+</html>

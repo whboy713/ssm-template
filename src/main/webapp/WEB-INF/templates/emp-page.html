@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        table {
+            border-collapse: collapse;
+            margin: 0px auto 0px auto;
+        }
+
+        table th, td {
+            border: 1px solid black;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 组件名称：通用表单 -->
+    <!-- 组件作用：把删除超链接的 GET 请求转换为 POST，并携带 _method 请求参数 -->
+    <form id="convertForm" method="post">
+
+        <!-- 请求参数作用：告诉服务器端 hiddenHttpMethodFilter 要转换的目标请求方式 -->
+        <!-- 请求参数名：_method，这是 hiddenHttpMethodFilter 中规定的 -->
+        <!-- 请求参数值：delete，这是因为我们希望服务器端将请求方式最终转换为 delete -->
+        <input type="hidden" name="_method" value="delete"/>
+    </form>
+
+    <table id="dataTable">
+        <tr>
+            <th>ID</th>
+            <th>NAME</th>
+            <th>SALARY</th>
+            <th>DELETE</th>
+            <th>EDIT</th>
+        </tr>
+        <tbody th:if="${#lists.isEmpty(pageInfo.list)}">
+            <tr>
+                <td colspan="3">抱歉！没有查询到数据！</td>
+            </tr>
+        </tbody>
+        <tbody th:if="${not #lists.isEmpty(pageInfo.list)}">
+            <tr th:each="emp : ${pageInfo.list}">
+                <td th:text="${emp.empId}">这里显示员工ID</td>
+                <td th:text="${emp.empName}">这里显示员工NAME</td>
+                <td th:text="${emp.empSalary}">这里显示员工SALARY</td>
+                <td>
+                    <!-- /emp/{empId}/{pageNo} -->
+                    <a th:href="@{/emp/}+${emp.empId}+'/'+${pageInfo.pageNum}" @click="doConvert">删除</a>
+                </td>
+                <td>
+                    <a th:href="@{/emp/}+${emp.empId}+'/'+${pageInfo.pageNum}">更新</a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <span th:if="${pageInfo.hasPreviousPage}">
+                        <a th:href="@{/get/page/1}">首页</a>
+                        <a th:href="@{/get/page/}+${pageInfo.prePage}">上一页</a>
+                    </span>
+
+                    <span th:each="navigator : ${pageInfo.navigatepageNums}">
+
+                        <!-- th:if 判断当前标签是否是当前页 -->
+                        <!-- 如果不是当前页则显示超链接 -->
+                        <a th:if="${navigator != pageInfo.pageNum}"
+                           th:href="@{/get/page/}+${navigator}"
+                           th:text="'['+${navigator}+']'"></a>
+
+                        <!-- 如果是当前页则显示页码本身 -->
+                        <span th:if="${navigator == pageInfo.pageNum}" th:text="'['+${navigator}+']'"></span>
+                    </span>
+
+                    <span th:if="${pageInfo.hasNextPage}">
+                        <a th:href="@{/get/page/}+${pageInfo.nextPage}">下一页</a>
+                        <a th:href="@{/get/page/}+${pageInfo.pages}">最后一页</a>
+                    </span>
+
+                    <span th:text="${pageInfo.pageNum}+'/'+${pageInfo.pages}"></span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <a th:href="@{/emp/add}">前往添加数据的表单页面</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a th:href="@{/}">回首页</a>
+
+</body>
+<script type="text/javascript" th:src="@{/script/vue.js}"></script>
+<script type="text/javascript">
+
+    new Vue({
+        "el":"#dataTable",
+        "methods":{
+            "doConvert":function () {
+
+                // 1.根据 id 值查询到通用表单的元素对象
+                var convertFormEle = document.getElementById("convertForm");
+
+                // 2.将当前超链接的 href 属性值赋值给通用表单的元素对象的 action 属性
+                // ①event：当前事件对象
+                // ②event.target：当前点击的超链接对象
+                // ③event.target.href：读取当前超链接对象的 href 属性
+                // ④convertFormEle.action：给表单的 action 属性赋值
+                convertFormEle.action = event.target.href;
+
+                // 3.提交通用表单
+                convertFormEle.submit();
+
+                // 测试单击响应函数是否正确绑定
+                // console.log("你点我了！！！");
+
+                // 取消超链接控件的默认行为
+                event.preventDefault();
+            }
+        }
+    });
+
+</script>
+</html>
